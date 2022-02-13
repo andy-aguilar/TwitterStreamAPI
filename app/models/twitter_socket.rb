@@ -28,7 +28,11 @@ class TwitterSocket < ApplicationRecord
     end
     
     def self.new_rule(event, hashtag)
-        # Creates
+        # If the event already has a hashtag associated with it update that hashtag.
+        if(event.rule_id){
+            delete_single_rule(event.rule_id)
+        }
+        # TODO: this method expects hashtag to already have its own # consider adding some sort of validation there.
         payload = {
             add: [{'value': hashtag}]
         }
@@ -42,14 +46,16 @@ class TwitterSocket < ApplicationRecord
             body: JSON.dump(payload)
         }
         
+        # When response comes back, set the event's rule_id to the new id.
         response = Typhoeus.post(@@RULES_URL, options)
+        raise "An error occurred while adding rules: #{response.status_message}" unless response.success?
         new_rule = JSON.parse(response.body)
         new_id = new_rule["data"][0]["id"]
-        byebug
-        raise "An error occurred while adding rules: #{response.status_message}" unless response.success?
+        event.rule_id = new_id
     end
 
     def self.get_all_rules
+        # Returns an array of all of the rules for the twitter stream. Generally only used to delete all rules
         options = {
             headers: {
                 "User-Agent": "v2FilteredStreamRuby",
@@ -64,9 +70,19 @@ class TwitterSocket < ApplicationRecord
     end
 
     def self.delete_all_rules
+        # Maps over all rules to get just the ids, then calls delete rules for those ids
         rules = get_all_rules
         ids = rules['data'].map { |rule| rule["id"]}
 
+        delete_rules(ids)        
+    end
+
+    def self.delete_single_rule(id)
+        # Can delete a single rule if given its ID
+        delete_rules([id])
+    end
+
+    def self.delete_rules(ids)
         payload = {
             delete: {
                 ids: ids
@@ -85,7 +101,6 @@ class TwitterSocket < ApplicationRecord
         response = Typhoeus.post(@@RULES_URL, options)
         puts response
         raise "An error occured while deleting your rules: #{response.status_message}" unless response.success?
-
     end
     
     
