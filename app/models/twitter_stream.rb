@@ -1,7 +1,7 @@
 class TwitterStream < ApplicationRecord
-    @@STREAM_URL = "https://api.twitter.com/2/tweets/search/stream"
-    @@RULES_URL = "https://api.twitter.com/2/tweets/search/stream/rules"
-    @@BEARER_TOKEN = ENV["TWITTER_BEARER_TOKEN"]
+    STREAM_URL = "https://api.twitter.com/2/tweets/search/stream"
+    RULES_URL = "https://api.twitter.com/2/tweets/search/stream/rules"
+    BEARER_TOKEN = ENV["TWITTER_BEARER_TOKEN"]
     
     def self.stream_connect
         params = {
@@ -14,12 +14,12 @@ class TwitterStream < ApplicationRecord
             method: 'get',
             headers: {
                 "User-Agent": "v2FilteredStreamRuby",
-                "Authorization": "Bearer #{@@BEARER_TOKEN}"
+                "Authorization": "Bearer #{BEARER_TOKEN}"
             },
             params: params
         }
 
-        request = Typhoeus::Request.new(@@STREAM_URL, options)
+        request = Typhoeus::Request.new(STREAM_URL, options)
         request.on_body do |chunk|
             puts chunk
         end
@@ -39,14 +39,14 @@ class TwitterStream < ApplicationRecord
         options = {
             headers: {
                 "User-Agent": "v2FilteredStreamRuby",
-                "Authorization": "Bearer #{@@BEARER_TOKEN}",
+                "Authorization": "Bearer #{BEARER_TOKEN}",
                 "Content-type": "application/json"
             },
             body: JSON.dump(payload)
         }
         
         # When response comes back, set the event's rule_id to the new id.
-        response = Typhoeus.post(@@RULES_URL, options)
+        response = Typhoeus.post(RULES_URL, options)
         raise "An error occurred while adding rules: #{response.status_message}" unless response.success?
         new_rule = JSON.parse(response.body)
         new_id = new_rule["data"][0]["id"]
@@ -58,11 +58,11 @@ class TwitterStream < ApplicationRecord
         options = {
             headers: {
                 "User-Agent": "v2FilteredStreamRuby",
-                "Authorization": "Bearer #{@@BEARER_TOKEN}"
+                "Authorization": "Bearer #{BEARER_TOKEN}"
             }
         }
 
-        response = Typhoeus.get(@@RULES_URL, options)
+        response = Typhoeus.get(RULES_URL, options)
         raise "An error occured while retrieving rules from your stream: #{response.body}" unless response.success?
         
         JSON.parse(response.body)
@@ -91,13 +91,13 @@ class TwitterStream < ApplicationRecord
         options = {
             headers: {
                 "User-Agent": "v2FilteredStreamRuby",
-                "Authorization": "Bearer #{@@BEARER_TOKEN}",
+                "Authorization": "Bearer #{BEARER_TOKEN}",
                 "Content-type": "application/json"
             },
             body: JSON.dump(payload)
         }
 
-        response = Typhoeus.post(@@RULES_URL, options)
+        response = Typhoeus.post(RULES_URL, options)
         puts response
         raise "An error occured while deleting your rules: #{response.status_message}" unless response.success?
     end
