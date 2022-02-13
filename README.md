@@ -5,14 +5,16 @@
 3. `figaro`: creates environment file and adds it to gitignore. Allows you to access env variables using `ENV["VARIABLE_NAME"]`
 ### Tasks:
 1. Add all three gems to gemfile
-2. Run `bundle exec figaro install`: Creates `./config/application.yml` file where you can store env variables, and adds file to `.gitignore`
+2. Run `bundle install`
+3. Run `bundle exec figaro install`: Creates `./config/application.yml` file where you can store env variables, and adds file to `.gitignore`
 
 # Create app on twitter developer site
 ### Tasks:
 1. Go to [Twitter's developer site](developer.twitter.com) and create an app.
 2. Add the api_key, api_key_secret, and bearer-token to your `./config/application.yml` file. File should look like this: 
 
-``` TWITTER_API_KEY: qNfakenumbersnotmyrealkeyzq
+``` 
+TWITTER_API_KEY: qNfakenumbersnotmyrealkeyzq
 TWITTER_API_KEY_SECRET: jtSlsdkafjpiadsfpouhgfl;askjdftNasdfasfaocY
 TWITTER_BEARER_TOKEN: AadfhasdkfjhakjsfhaslkjhdflkasjhflkajshdflkjashdfkljhasdkfjhaslkjhWrVhe 
 ```

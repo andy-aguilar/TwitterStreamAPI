@@ -26,16 +26,16 @@ class TwitterStream < ApplicationRecord
         request.run
     end
     
-    def self.new_rule(event, hashtag)
+    def self.new_rule(event)
         # If the event already has a hashtag associated with it update that hashtag.
         if(event.rule_id)
             delete_single_rule(event.rule_id)
         end
+
         # TODO: this method expects hashtag to already have its own # consider adding some sort of validation there.
         payload = {
-            add: [{'value': hashtag}]
+            add: [{'value': event.hashtag, 'tag': event.hashtag }]
         }
-
         options = {
             headers: {
                 "User-Agent": "v2FilteredStreamRuby",
@@ -50,7 +50,9 @@ class TwitterStream < ApplicationRecord
         raise "An error occurred while adding rules: #{response.status_message}" unless response.success?
         new_rule = JSON.parse(response.body)
         new_id = new_rule["data"][0]["id"]
+        byebug
         event.rule_id = new_id
+        
     end
 
     def self.get_all_rules
