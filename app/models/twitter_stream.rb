@@ -28,9 +28,9 @@ class TwitterStream < ApplicationRecord
     
     def self.new_rule(event, hashtag)
         # If the event already has a hashtag associated with it update that hashtag.
-        if(event.rule_id){
+        if(event.rule_id)
             delete_single_rule(event.rule_id)
-        }
+        end
         # TODO: this method expects hashtag to already have its own # consider adding some sort of validation there.
         payload = {
             add: [{'value': hashtag}]
