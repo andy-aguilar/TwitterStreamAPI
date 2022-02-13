@@ -1,4 +1,4 @@
-class TwitterStream < ApplicationRecord
+class TwitterSocket < ApplicationRecord
     @@STREAM_URL = "https://api.twitter.com/2/tweets/search/stream"
     @@RULES_URL = "https://api.twitter.com/2/tweets/search/stream/rules"
     @@BEARER_TOKEN = ENV["TWITTER_BEARER_TOKEN"]
@@ -48,7 +48,45 @@ class TwitterStream < ApplicationRecord
         byebug
         raise "An error occurred while adding rules: #{response.status_message}" unless response.success?
     end
-    
+
+    def self.get_all_rules
+        options = {
+            headers: {
+                "User-Agent": "v2FilteredStreamRuby",
+                "Authorization": "Bearer #{@@BEARER_TOKEN}"
+            }
+        }
+
+        response = Typhoeus.get(@@RULES_URL, options)
+        raise "An error occured while retrieving rules from your stream: #{response.body}" unless response.success?
+        
+        JSON.parse(response.body)
+    end
+
+    def self.delete_all_rules
+        rules = get_all_rules
+        ids = rules['data'].map { |rule| rule["id"]}
+
+        payload = {
+            delete: {
+                ids: ids
+            }
+        }
+
+        options = {
+            headers: {
+                "User-Agent": "v2FilteredStreamRuby",
+                "Authorization": "Bearer #{@@BEARER_TOKEN}",
+                "Content-type": "application/json"
+            },
+            body: JSON.dump(payload)
+        }
+
+        response = Typhoeus.post(@@RULES_URL, options)
+        puts response
+        raise "An error occured while deleting your rules: #{response.status_message}" unless response.success?
+
+    end
     
     
     
