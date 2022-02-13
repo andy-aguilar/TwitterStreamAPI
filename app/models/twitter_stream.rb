@@ -52,7 +52,6 @@ class TwitterStream < ApplicationRecord
         new_id = new_rule["data"][0]["id"]
         byebug
         event.rule_id = new_id
-        
     end
 
     def self.get_all_rules
